@@ -206,7 +206,7 @@
         oldBindFramebuffer.apply(this, arguments);
         if (b === null) {
           bindingType = 'skip';
-        } else if (this.getFramebufferAttachmentParameter(a, this.DEPTH_STENCIL_ATTACHMENT, this.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME)) {
+        } else if (this.getFramebufferAttachmentParameter(a, this.STENCIL_ATTACHMENT, this.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME)) {
           bindingType = 'redirect';
           b = null;
           oldBindFramebuffer.call(this, a, b);
