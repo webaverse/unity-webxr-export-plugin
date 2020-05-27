@@ -224,6 +224,16 @@
           oldDrawArrays.apply(this, arguments);
         }
       })(this.ctx.drawArrays);
+      this.ctx.invalidateFramebuffer = (oldInvalidateFramebuffer => function invalidateFramebuffer() {
+        if (bindingType === null) {
+          oldInvalidateFramebuffer.apply(this, arguments);
+        }
+      })(this.ctx.invalidateFramebuffer);
+      this.ctx.drawBuffers = (oldDrawBuffers => function drawBuffers() {
+        if (bindingType === null) {
+          oldDrawBuffers.apply(this, arguments);
+        }
+      })(this.ctx.drawBuffers);
     }
   }
 
