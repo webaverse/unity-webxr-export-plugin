@@ -1,6 +1,17 @@
 (function () {
   'use strict';
 
+  const _makePromise = () => {
+    let accept, reject;
+    const p = new Promise((a, r) => {
+      accept = a;
+      reject = r;
+    });
+    p.accept = accept;
+    p.reject = reject;
+    return p;
+  };
+
   function XRData() {
     this.leftProjectionMatrix = mat4.create();
     this.rightProjectionMatrix = mat4.create();
@@ -220,6 +231,8 @@
       this.inlineSession = false;
       return;
     }
+    
+    unityLoadedPromise.accept(this);
 
     /* navigator.xr.isSessionSupported('inline').then((supported) => {
       if (supported) {
@@ -493,6 +506,9 @@
     this.fps = this.frameTimes.length;
     this.perfStatus.innerHTML = this.fps;
   }
+  
+  const unityLoadedPromise = _makePromise();
+  const sessiongrantedPromise = _makePromise();
 
   function init() {
     // Detect existing xr
@@ -515,6 +531,16 @@
     }
 
   }
-
   init();
+  
+  navigator.xr.addEventListener('sessiongranted', e => {
+    sessiongrantedPromise.accept();
+  });
+  Promise.all([
+    unityLoadedPromise,
+    sessiongrantedPromise,
+  ])
+    .then(([xrManager]) => {
+      xrManager.toggleVR();
+    });
 })();
