@@ -194,6 +194,36 @@
         }
         return oldBindFramebuffer.call(this, target, fbo);
       })(this.ctx.bindFramebuffer);
+      this.ctx.viewport = (oldViewport => function viewport(x, y, w, h) {
+        if (x === 0 && y === 0 && w === this.drawingBufferWidth/2 && h === this.drawingBufferHeight) {
+          oldViewport.call(this, x, y, this.drawingBufferWidth, this.drawingBufferHeight);
+        } else {
+          oldViewport.apply(this, arguments);
+        }
+      })(this.ctx.viewport);
+      let bindingType = null;
+      this.ctx.bindFramebuffer = (oldBindFramebuffer => function bindFramebuffer(a, b) {
+        oldBindFramebuffer.apply(this, arguments);
+        if (b === null) {
+          bindingType = 'skip';
+        } else if (this.getFramebufferAttachmentParameter(a, this.DEPTH_STENCIL_ATTACHMENT, this.FRAMEBUFFER_ATTACHMENT_OBJECT_NAME)) {
+          bindingType = 'redirect';
+          b = null;
+          oldBindFramebuffer.call(this, a, b);
+        } else {
+          bindingType = null;
+        }
+      })(this.ctx.bindFramebuffer);
+      this.ctx.drawElements = (oldDrawElements => function drawElements() {
+        if (bindingType !== 'skip') {
+          oldDrawElements.apply(this, arguments);
+        }
+      })(this.ctx.drawElements);
+      this.ctx.drawArrays = (oldDrawArrays => function drawArrays() {
+        if (bindingType !== 'skip') {
+          oldDrawArrays.apply(this, arguments);
+        }
+      })(this.ctx.drawArrays);
     }
   }
 
