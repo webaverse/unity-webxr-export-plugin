@@ -1,0 +1,1 @@
+cd ..\Build & npx xrpk init & npx xrpk build . package.wbn & move package.wbn .. & exit
